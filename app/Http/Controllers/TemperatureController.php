@@ -7,6 +7,7 @@ use App\Models\Log;
 use App\Jobs\ProcessCSV;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
+
 class TemperatureController extends Controller
 {
     /**
@@ -19,7 +20,6 @@ class TemperatureController extends Controller
         //
         $names = Log::select("name")->distinct()->get();
         return response($names->toJson());
-       
     }
 
     /**
@@ -41,12 +41,16 @@ class TemperatureController extends Controller
     public function store(Request $request)
     {
         //
-       
-        $file = $request->file("file");
-        $filepath = $file->getRealPath();
-        $path = Storage::putFile('log', new File($filepath));
-        ProcessCSV::dispatch( $path,$request->input("name"));
-        return response("File Uploaded",201); 
+
+        $files = $request->file("files");
+        $names = $request->input("names");
+
+        for ($i = 0; $i < count($files); $i++) {
+            $filepath = $files[$i]->getRealPath();
+            $path = Storage::putFile('log', new File($filepath));
+            ProcessCSV::dispatch($path, $names[$i]);
+        }
+        return response("Files Uploaded", 201);
     }
 
     /**
@@ -57,7 +61,7 @@ class TemperatureController extends Controller
      */
     public function show(Request $request)
     {
-        return response(Log::select("temperature","timestamp")->where("name",$request->input("name"))->orderby("timestamp")->get()->toJson());
+        return response(Log::select("temperature", "timestamp")->where("name", $request->input("name"))->orderby("timestamp")->get()->toJson());
     }
 
     /**

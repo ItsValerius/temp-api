@@ -24,7 +24,7 @@ class LogFactory extends Factory
     {
         return [
             //
-            "name" => "DCLP " . $this->faker->numberBetween(1,10),
+            "name" => "DCLP" . $this->faker->numberBetween(1,10),
             "temperature" => $this->faker->randomFloat(2,0,25),
             "timestamp" => $this->faker->dateTimeBetween("-30 Days"),
         ];
